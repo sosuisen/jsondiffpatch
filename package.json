@@ -1,6 +1,6 @@
 {
   "name": "@sosuisen/jsondiffpatch",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "author": "Benjamin Eidelman <beneidel@gmail.com>",
   "description": "Diff & Patch for Javascript objects",
   "contributors": [
@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/benjamine/jsondiffpatch.git"
+    "url": "https://github.com/sosuisen/jsondiffpatch.git"
   },
   "keywords": [
     "json",
@@ -82,5 +82,5 @@
   "engines": {
     "node": ">=8.17.0"
   },
-  "homepage": "https://github.com/benjamine/jsondiffpatch"
+  "homepage": "https://github.com/sosuisen/jsondiffpatch"
 }
