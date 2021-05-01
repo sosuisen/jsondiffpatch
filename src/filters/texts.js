@@ -60,10 +60,12 @@ export const diffFilter = function textsDiffFilter(context) {
   if (context.leftType !== 'string') {
     return;
   }
+  // Accept minLength = 0
   let minLength =
-    (context.options &&
-      context.options.textDiff &&
-      context.options.textDiff.minLength) ||
+  (context.options &&
+    context.options.textDiff &&
+    // context.options.textDiff.minLength) ||
+    context.options.textDiff.minLength >= 0) ||
     DEFAULT_MIN_LENGTH;
   if (context.left.length < minLength || context.right.length < minLength) {
     context.setResult([context.left, context.right]).exit();
