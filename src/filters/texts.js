@@ -61,12 +61,16 @@ export const diffFilter = function textsDiffFilter(context) {
     return;
   }
   // Accept minLength = 0
-  let minLength =
-  (context.options &&
+  let minLength;
+  if (context.options &&
     context.options.textDiff &&
     // context.options.textDiff.minLength) ||
-    context.options.textDiff.minLength >= 0) ||
-    DEFAULT_MIN_LENGTH;
+    context.options.textDiff.minLength >= 0) {
+    minLength = context.options.textDiff.minLength;
+  } else {
+    minLength = DEFAULT_MIN_LENGTH;
+  }
+
   if (context.left.length < minLength || context.right.length < minLength) {
     context.setResult([context.left, context.right]).exit();
     return;
