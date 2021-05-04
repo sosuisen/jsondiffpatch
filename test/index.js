@@ -10,7 +10,7 @@ import lcs from '../src/filters/lcs';
 const expect = chai.expect;
 
 describe('jsondiffpatch', () => {
-  before(() => {});
+  before(() => { });
   it('has a diff method', () => {
     expect(jsondiffpatch.diff).to.be.a('function');
   });
@@ -501,8 +501,8 @@ describe('DiffPatcher', () => {
 
         it('should sort the ops', () => {
           expectFormat(
-            { 'hl': [ { id: 1, bla: 'bla' }, { id: 2, bla: 'ga' } ] },
-            { 'hl': [ { id: 2, bla: 'bla' }, { id: 1, bla: 'ga' } ] },
+            { 'hl': [{ id: 1, bla: 'bla' }, { id: 2, bla: 'ga' }] },
+            { 'hl': [{ id: 2, bla: 'bla' }, { id: 1, bla: 'ga' }] },
             [
               moveOp('/hl/1', '/hl/0'),
               replaceOp('/hl/0/bla', 'bla'),
@@ -517,8 +517,8 @@ describe('DiffPatcher', () => {
 
       it('should add full path for moved op', () => {
         expectFormat(
-          {'hl': [1, 2]},
-          {'hl': [2, 1]},
+          { 'hl': [1, 2] },
+          { 'hl': [2, 1] },
           [moveOp('/hl/1', '/hl/0')]);
       });
 
@@ -615,8 +615,7 @@ describe('DiffPatcher', () => {
           html.push('<li>');
           html.push('<div class="jsondiffpatch-textdiff-location">');
           html.push(
-            `<span class="jsondiffpatch-textdiff-line-number">${
-              diff.start
+            `<span class="jsondiffpatch-textdiff-line-number">${diff.start
             }</span>`
           );
           html.push(
@@ -627,8 +626,7 @@ describe('DiffPatcher', () => {
 
           arrayForEach(diff.data, function(data) {
             html.push(
-              `<span class="jsondiffpatch-textdiff-${data.type}">${
-                data.text
+              `<span class="jsondiffpatch-textdiff-${data.type}">${data.text
               }</span>`
             );
           });
@@ -745,7 +743,7 @@ describe('lcs', () => {
 
     // indices1 and indices2 show where the sequence
     // elements are located in the original arrays
-    expect(lcs.get([ 1 ], [ -9, 1 ])).to.deep.equal({
+    expect(lcs.get([1], [-9, 1])).to.deep.equal({
       sequence: [1],
       indices1: [0],
       indices2: [1],
@@ -753,7 +751,7 @@ describe('lcs', () => {
 
     // indices1 and indices2 show where the sequence
     // elements are located in the original arrays
-    expect(lcs.get([ 1, 9, 3, 4, 5 ], [ -9, 1, 34, 3, 2, 1, 5, 93 ]))
+    expect(lcs.get([1, 9, 3, 4, 5], [-9, 1, 34, 3, 2, 1, 5, 93]))
       .to.deep.equal({
         sequence: [1, 3, 5],
         indices1: [0, 2, 4],
@@ -780,7 +778,7 @@ describe('lcs', () => {
 });
 
 describe('plainTextProperties', function() {
-  it('can diff', function() {
+  it('can diff a top level property', function() {
     const options = {
       plainTextProperties: {
         a: true,
@@ -805,7 +803,134 @@ describe('plainTextProperties', function() {
     };
 
     const delta = instance.diff(left, right);
-    console.log(delta);
-    // expect(delta).to.deep.equal(example.delta);
+    expect(delta).to.deep.equal({
+      a: ['@@ -1 +1,2 @@\n A\n+*\n', 0, 2],
+      b1: { b2: ['B', 'B*'] },
+      c: { '0': ['C*'], _t: 'a', _0: ['C', 0, 0] },
+      d1: { '0': { d2: ['D', 'D*'] }, _t: 'a' },
+    });
+  });
+
+  it('can diff one of the second level properties', function() {
+    const options = {
+      plainTextProperties: {
+        b1: {
+          b3: true,
+        },
+      },
+    };
+    const instance = new DiffPatcher(options);
+    const left = {
+      a: 'A',
+      b1: {
+        b2: 'B',
+        b3: 'B',
+      },
+      c: ['C'],
+      d1: [{ 'd2': 'D' }],
+    };
+    const right = {
+      a: 'A*',
+      b1: {
+        b2: 'B*',
+        b3: 'B*',
+      },
+      c: ['C*'],
+      d1: [{ 'd2': 'D*' }],
+    };
+
+    const delta = instance.diff(left, right);
+    expect(delta).to.deep.equal({
+      a: ['A', 'A*'],
+      b1: {
+        b2: ['B', 'B*'],
+        b3: ['@@ -1 +1,2 @@\n B\n+*\n', 0, 2],
+      },
+      c: { '0': ['C*'], _t: 'a', _0: ['C', 0, 0] },
+      d1: { '0': { d2: ['D', 'D*'] }, _t: 'a' },
+    });
+  });
+
+  it('can diff all of the second level properties by _any', function() {
+    const options = {
+      plainTextProperties: {
+        b1: {
+          _any: true,
+        },
+      },
+    };
+    const instance = new DiffPatcher(options);
+    const left = {
+      a: 'A',
+      b1: {
+        b2: 'B',
+        b3: 'B',
+      },
+      c: ['C'],
+      d1: [{ 'd2': 'D' }],
+    };
+    const right = {
+      a: 'A*',
+      b1: {
+        b2: 'B*',
+        b3: 'B*',
+      },
+      c: ['C*'],
+      d1: [{ 'd2': 'D*' }],
+    };
+
+    const delta = instance.diff(left, right);
+    expect(delta).to.deep.equal({
+      a: ['A', 'A*'],
+      b1: {
+        b2: ['@@ -1 +1,2 @@\n B\n+*\n', 0, 2],
+        b3: ['@@ -1 +1,2 @@\n B\n+*\n', 0, 2],
+      },
+      c: { '0': ['C*'], _t: 'a', _0: ['C', 0, 0] },
+      d1: { '0': { d2: ['D', 'D*'] }, _t: 'a' },
+    });
+  });
+
+  it('can diff properties which match _regex', function() {
+    const options = {
+      plainTextProperties: {
+        b1: {
+          _regex: /3/,
+        },
+      },
+    };
+    const instance = new DiffPatcher(options);
+    const left = {
+      a: 'A',
+      b1: {
+        b2: 'B',
+        b3: 'B',
+        b4: 'B',
+      },
+      c: ['C'],
+      d1: [{ 'd2': 'D' }],
+    };
+    const right = {
+      a: 'A*',
+      b1: {
+        b2: 'B*',
+        b3: 'B*',
+        b4: 'B*',
+      },
+      c: ['C*'],
+      d1: [{ 'd2': 'D*' }],
+    };
+
+    const delta = instance.diff(left, right);
+    expect(delta).to.deep.equal({
+      a: ['A', 'A*'],
+      b1: {
+        b2: ['B', 'B*'],
+        b3: ['@@ -1 +1,2 @@\n B\n+*\n', 0, 2],
+        b4: ['B', 'B*'],
+      },
+      c: { '0': ['C*'], _t: 'a', _0: ['C', 0, 0] },
+      d1: { '0': { d2: ['D', 'D*'] }, _t: 'a' },
+    });
   });
 });
