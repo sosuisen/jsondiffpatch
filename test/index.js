@@ -778,3 +778,29 @@ describe('lcs', () => {
     lcs.get(randomArray(), randomArray());
   });
 });
+
+describe('plainTextProperties', function () {
+  it('can diff', function() {
+    const instance = new DiffPatcher();
+    const left = {
+      a: 'A',
+      b1: {
+        b2: 'B',
+      },
+      c: ['C'],
+      d1: [{ 'd2': 'D' }],
+    };
+    const right = {
+      a: 'A*',
+      b1: {
+        b2: 'B*',
+      },
+      c: ['C*'],
+      d1: [{ 'd2': 'D*' }],
+    };
+    
+    const delta = instance.diff(left, right);
+    console.log(delta);
+    // expect(delta).to.deep.equal(example.delta);
+  });
+});

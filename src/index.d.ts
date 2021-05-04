@@ -148,9 +148,19 @@ export interface Config {
     };
 
     textDiff?: {
-        // default 60, minimum string length (left and right sides) to use text diff algorythm: google-diff-match-patch
+        // default 60, minimum string length (left and right sides) to use text diff algorithm: google-diff-match-patch
         minLength: number,
     };
+
+    /**
+     * Object properties to use text diff algorithm: google-diff-match-patch.
+     * This option is mutually exclusive with textDiff.minLength option.
+     * 
+     * e.g.
+     * { a: { b: true }, c: true } shows that a value of the property 'b' whose ancestor is only 'a'
+     * and a value of the property 'c' use google-diff-match-patch.
+     */
+    plainTextProperties?: { [key: string]: any }; 
 
     /**
      * this optional function can be specified to ignore object properties (eg. volatile data)

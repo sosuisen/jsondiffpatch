@@ -60,21 +60,66 @@ export const diffFilter = function textsDiffFilter(context) {
   if (context.leftType !== 'string') {
     return;
   }
-  // Accept minLength = 0
-  let minLength;
+  
+  // console.log(`parent: ${context.parent ? context.parent.childName : undefined}, name: ${context.childName}`);
+
+  let useTextDiff = false;
   if (context.options &&
-    context.options.textDiff &&
-    // context.options.textDiff.minLength) ||
-    context.options.textDiff.minLength >= 0) {
-    minLength = context.options.textDiff.minLength;
-  } else {
-    minLength = DEFAULT_MIN_LENGTH;
+    context.options.plainTextProperties) {
+    const path = [];
+    let parent = context.parent;
+    while (parent !== undefined) {
+      path.unshift(parent.childName);
+      parent = parent.parent;
+    }
+    let subtree = context.options.plainTextProperties;
+    for (let depth=0; depth < path.length-1; depth++) {
+      subtree = subtree[path[depth]];
+      if (subtree === undefined) {
+        break;
+      }
+    }
+    if (subtree !== undefined) {
+      if (subtree['_any']){
+        useTextDiff = true;
+      }
+      else if (subtree['_regex']){
+        const regex = subtree['_regex'];
+        if (regex instanceof RegExp) {
+          if (regex.test(path[path.length-1])){
+            useTextDiff = true;
+          }
+        }
+      }
+      else if (subtree[path[path.length-1]] === true) {
+       useTextDiff = true;
+      }
+    }
+  }
+  else {
+    // Accept minLength = 0
+    let minLength;
+    if (context.options &&
+      context.options.textDiff &&
+      context.options.textDiff.minLength >= 0) {
+      minLength = context.options.textDiff.minLength;
+    } else {
+      minLength = DEFAULT_MIN_LENGTH;
+    }
+
+    if (context.left.length < minLength || context.right.length < minLength) {
+      useTextDiff = false;
+    }
+    else {
+      useTextDiff = true;
+    }
   }
 
-  if (context.left.length < minLength || context.right.length < minLength) {
+  if (!useTextDiff) {
     context.setResult([context.left, context.right]).exit();
     return;
   }
+
   // large text, try to use a text-diff algorithm
   let diffMatchPatch = getDiffMatchPatch();
   if (!diffMatchPatch) {
