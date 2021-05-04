@@ -153,12 +153,13 @@ export interface Config {
     };
 
     /**
-     * Object properties to use text diff algorithm: google-diff-match-patch.
+     * Object property whose key matches plainTextProperties uses text diff algorithm: google-diff-match-patch.
      * This option is mutually exclusive with textDiff.minLength option.
      * 
      * e.g.
-     * { a: { b: true }, c: true } shows that a value of the property 'b' whose ancestor is only 'a'
-     * and a value of the property 'c' use google-diff-match-patch.
+     * { a: { b: true }, c: true } matches 'b' (whose ancestor is only 'a') and 'c'.
+     * { a: { _all: true } } matches all child properties of 'a'.
+     * { a: { _regex: /abc/ } } matches child properties of 'a' which match /abc/.
      */
     plainTextProperties?: { [key: string]: any }; 
 
