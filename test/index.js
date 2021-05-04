@@ -779,9 +779,14 @@ describe('lcs', () => {
   });
 });
 
-describe('plainTextProperties', function () {
+describe('plainTextProperties', function() {
   it('can diff', function() {
-    const instance = new DiffPatcher();
+    const options = {
+      plainTextProperties: {
+        a: true,
+      },
+    };
+    const instance = new DiffPatcher(options);
     const left = {
       a: 'A',
       b1: {
@@ -798,7 +803,7 @@ describe('plainTextProperties', function () {
       c: ['C*'],
       d1: [{ 'd2': 'D*' }],
     };
-    
+
     const delta = instance.diff(left, right);
     console.log(delta);
     // expect(delta).to.deep.equal(example.delta);
