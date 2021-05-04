@@ -150,18 +150,19 @@ export interface Config {
     textDiff?: {
         // default 60, minimum string length (left and right sides) to use text diff algorithm: google-diff-match-patch
         minLength: number,
+
+        /**
+         * Object property whose key matches plainTextProperties uses text diff algorithm: google-diff-match-patch.
+         * This option is mutually exclusive with textDiff.minLength option.
+         * 
+         * e.g.
+         * { a: { b: true }, c: true } matches 'b' (whose ancestor is only 'a') and 'c'.
+         * { a: { _all: true } } matches all child properties of 'a'.
+         * { a: { _regex: /abc/ } } matches child properties of 'a' which match /abc/.
+         */
+        plainTextProperties?: { [key: string]: any };         
     };
 
-    /**
-     * Object property whose key matches plainTextProperties uses text diff algorithm: google-diff-match-patch.
-     * This option is mutually exclusive with textDiff.minLength option.
-     * 
-     * e.g.
-     * { a: { b: true }, c: true } matches 'b' (whose ancestor is only 'a') and 'c'.
-     * { a: { _all: true } } matches all child properties of 'a'.
-     * { a: { _regex: /abc/ } } matches child properties of 'a' which match /abc/.
-     */
-    plainTextProperties?: { [key: string]: any }; 
 
     /**
      * this optional function can be specified to ignore object properties (eg. volatile data)

@@ -64,10 +64,11 @@ export const diffFilter = function textsDiffFilter(context) {
   // eslint-disable-next-line max-len
   // console.log(`parent: ${context.parent ? context.parent.childName : undefined}, name: ${context.childName}`);
   // eslint-disable-next-line max-len
-  // console.log('# option: ' + JSON.stringify(context.options.plainTextProperties));
+  // console.log('# option: ' + JSON.stringify(context.options.textDiff.plainTextProperties));
   let useTextDiff = false;
   if (context.options &&
-    context.options.plainTextProperties) {
+    context.options.textDiff &&
+    context.options.textDiff.plainTextProperties) {
     const path = [context.childName];
     let parent = context.parent;
     while (parent.childName !== undefined) {
@@ -75,7 +76,7 @@ export const diffFilter = function textsDiffFilter(context) {
       parent = parent.parent;
     }
     // console.log(`path: ` + JSON.stringify(path));
-    let subtree = context.options.plainTextProperties;
+    let subtree = context.options.textDiff.plainTextProperties;
     for (let depth = 0; depth < path.length - 1; depth++) {
       subtree = subtree[path[depth]];
       if (subtree === undefined) {
