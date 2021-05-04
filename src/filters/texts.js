@@ -60,43 +60,44 @@ export const diffFilter = function textsDiffFilter(context) {
   if (context.leftType !== 'string') {
     return;
   }
-  
-  // console.log(`parent: ${context.parent ? context.parent.childName : undefined}, name: ${context.childName}`);
 
+  // eslint-disable-next-line max-len
+  // console.log(`parent: ${context.parent ? context.parent.childName : undefined}, name: ${context.childName}`);
+  // eslint-disable-next-line max-len
+  // console.log('# option: ' + JSON.stringify(context.options.plainTextProperties));
   let useTextDiff = false;
   if (context.options &&
     context.options.plainTextProperties) {
-    const path = [];
+    const path = [context.childName];
     let parent = context.parent;
-    while (parent !== undefined) {
+    while (parent.childName !== undefined) {
       path.unshift(parent.childName);
       parent = parent.parent;
     }
+    // console.log(`path: ` + JSON.stringify(path));
     let subtree = context.options.plainTextProperties;
-    for (let depth=0; depth < path.length-1; depth++) {
+    for (let depth = 0; depth < path.length - 1; depth++) {
       subtree = subtree[path[depth]];
       if (subtree === undefined) {
         break;
       }
     }
+    // console.log('# subtree: ' + JSON.stringify(subtree));
     if (subtree !== undefined) {
-      if (subtree['_any']){
+      if (subtree['_any']) {
         useTextDiff = true;
-      }
-      else if (subtree['_regex']){
+      } else if (subtree['_regex']) {
         const regex = subtree['_regex'];
         if (regex instanceof RegExp) {
-          if (regex.test(path[path.length-1])){
+          if (regex.test(path[path.length - 1])) {
             useTextDiff = true;
           }
         }
-      }
-      else if (subtree[path[path.length-1]] === true) {
-       useTextDiff = true;
+      } else if (subtree[path[path.length - 1]] === true) {
+        useTextDiff = true;
       }
     }
-  }
-  else {
+  } else {
     // Accept minLength = 0
     let minLength;
     if (context.options &&
@@ -109,12 +110,11 @@ export const diffFilter = function textsDiffFilter(context) {
 
     if (context.left.length < minLength || context.right.length < minLength) {
       useTextDiff = false;
-    }
-    else {
+    } else {
       useTextDiff = true;
     }
   }
-
+  // console.log('# useTextDiff: ' + useTextDiff);
   if (!useTextDiff) {
     context.setResult([context.left, context.right]).exit();
     return;
